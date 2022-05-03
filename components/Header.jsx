@@ -5,13 +5,17 @@ import { AiFillHome, AiOutlinePlusCircle, AiOutlineHeart } from 'react-icons/ai'
 import { FiMenu } from 'react-icons/fi'
 import { HiOutlinePaperAirplane } from 'react-icons/hi'
 import { GrGroup } from 'react-icons/gr'
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import { useRecoilState } from 'recoil'
+import { modalState } from '../atoms/modalAtom'
 
 function Header() {
 
     const { data: session } = useSession();
     const router = useRouter();
+    const [open, setOpen] = useRecoilState(modalState);
+    // const open = useRecoilValue(modalState) // Read only value
 
     return (
         <header className='shadow-sm border-b bg-white sticky top-0 z-50'>
@@ -49,7 +53,7 @@ function Header() {
 
                 {/* Right */}
                 <div className='flex items-center justify-end space-x-4'>
-                    <AiFillHome  onClick={() => router.push('/')} className='navBtn' />
+                    <AiFillHome onClick={() => router.push('/')} className='navBtn' />
                     <FiMenu className='h-6 md:hidden cursor-pointer' />
 
                     {session ? (
@@ -58,7 +62,7 @@ function Header() {
                                 <HiOutlinePaperAirplane className='navBtn rotate-45' />
                                 <div className="absolute -top-1 -right-2 text-xs w-5 h-5  bg-red-500 rounded-full flex items-center justify-center animate-pulse text-white">3</div>
                             </div>
-                            <AiOutlinePlusCircle className='navBtn' />
+                            <AiOutlinePlusCircle onClick={() => setOpen(true)} className='navBtn' />
                             <GrGroup className='navBtn' />
                             <AiOutlineHeart className='navBtn' />
 
