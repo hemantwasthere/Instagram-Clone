@@ -25,7 +25,7 @@ function Post({ id, username, userImg, img, caption }) {
         <div className='flex space-x-4'>
           <AiOutlineHeart className='btn' />
           <BsChatDots className='btn' />
-          <HiOutlinePaperAirplane className='btn' />
+          <HiOutlinePaperAirplane className='btn rotate-45' />
         </div>
         <BsBookmark className='btn' />
       </div>
@@ -41,7 +41,7 @@ function Post({ id, username, userImg, img, caption }) {
 
       {/* input box */}
       <form className='flex items-center p-4'>
-      <HiOutlineEmojiHappy className='h-7 ' />
+      <HiOutlineEmojiHappy className='h-7' />
       <input className='border-none flex-1 focus:ring-0 outline-none'
        placeholder='Add a comment...' type="text" />
       <button className='font-semibold text-blue-400'>Post</button>
