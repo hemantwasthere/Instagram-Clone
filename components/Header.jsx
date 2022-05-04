@@ -65,7 +65,7 @@ function Header() {
                             <AiOutlinePlusCircle onClick={() => setOpen(true)} className='navBtn' />
                             <GrGroup className='navBtn' />
                             <AiOutlineHeart className='navBtn' />
-
+                            {/* eslint-disable-next-line */}
                             <img className='h-10 w-10 rounded-full cursor-pointer' src={session.user.image} alt="" />
                         </>
                     ) : <button onClick={signIn}>Sign In</button>}

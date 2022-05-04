@@ -10,6 +10,7 @@ function Posts() {
 
     useEffect(() => onSnapshot(query(collection(db, 'posts')), orderBy('timestamp', 'desc'), snapshot => {
         setPosts(snapshot.docs);
+        // eslint-disable-next-line
     }), [db])
 
 

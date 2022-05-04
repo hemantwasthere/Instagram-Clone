@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
-import { AiOutlineHeart } from 'react-icons/ai'
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai'
 import { HiOutlinePaperAirplane, HiOutlineEmojiHappy } from 'react-icons/hi'
 import { BsChatDots, BsBookmark } from 'react-icons/bs'
 import { useSession } from 'next-auth/react'
-import { addDoc, collection, serverTimestamp, onSnapshot, query, orderBy } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp, onSnapshot, query, orderBy, setDoc, doc, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import Moment from 'react-moment'
 
@@ -14,14 +14,43 @@ function Post({ id, username, userImg, img, caption }) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
+  const [likes, setLikes] = useState([])
+  const [hasLiked, setHasLiked] = useState(false);
 
-  useEffect(() => onSnapshot(
-    query(
-      collection(db, 'posts', id, 'comments'),
-      orderBy('timestamp', 'desc')
-    ),
-    (snapshot) => setComments(snapshot.docs)), [db])
+  useEffect(() => {
+    onSnapshot(
+      query(
+        collection(db, 'posts', id, 'comments'),
+        orderBy('timestamp', 'desc')
+      ),
+      (snapshot) => setComments(snapshot.docs))
+    // eslint-disable-next-line
+  }, [db, id])
 
+  useEffect(() => {
+    onSnapshot(
+      query(collection(db, 'posts', id, 'likes')),
+      (snapshot) => setLikes(snapshot.docs))
+    // eslint-disable-next-line
+  }, [db, id])
+
+  useEffect(() => {
+    setHasLiked(
+      likes.findIndex((like) => like.id === session?.user?.uid) !== -1
+    )
+    // eslint-disable-next-line
+  }, [likes])
+
+
+  const likePost = async () => {
+    if (hasLiked) {
+      await deleteDoc(doc(db, 'posts', id, 'likes', session.user.uid))
+    } else {
+      await setDoc(doc(db, 'posts', id, 'likes', session.user.uid), {
+        username: session.user.username
+      })
+    }
+  }
 
   const sendComment = async (e) => {
     e.preventDefault();
@@ -40,12 +69,14 @@ function Post({ id, username, userImg, img, caption }) {
 
       {/* Header */}
       <div className='flex items-center p-5'>
+        {/* eslint-disable-next-line */}
         <img className='rounded-full h-12 w-12 object-contain border p-1 mr-3' src={userImg} alt="" />
         <p className='flex-1 font-bold'>{username}</p>
         <BiDotsHorizontalRounded className='h-5' />
       </div>
 
       {/* img */}
+      {/* eslint-disable-next-line */}
       <img className='object-cover w-full' src={img} alt="" />
 
 
@@ -53,7 +84,13 @@ function Post({ id, username, userImg, img, caption }) {
       {session && (
         <div className='flex justify-between px-4 pt-4'>
           <div className='flex space-x-4'>
-            <AiOutlineHeart className='btn' />
+            {
+              hasLiked ? (
+                <AiFillHeart onClick={likePost} className='btn text-red-500' />
+              ) : (
+                <AiOutlineHeart onClick={likePost} className='btn' />
+              )
+            }
             <BsChatDots className='btn' />
             <HiOutlinePaperAirplane className='btn rotate-45' />
           </div>
@@ -63,6 +100,9 @@ function Post({ id, username, userImg, img, caption }) {
 
       {/* caption */}
       <p className='p-5 truncate'>
+        {likes.length > 0 && (
+          <p className='font-bold mb-1 '>{likes.length} likes</p>
+        )}
         <span className='font-bold mr-1'>{username}</span>
         {caption}
       </p>
@@ -72,6 +112,7 @@ function Post({ id, username, userImg, img, caption }) {
         <div className='ml-10 h-20 overflow-y-scroll scrollbar-thumb-black scrollbar-thin'>
           {comments.map(comment => (
             <div key={comment.id} className='flex items-center space-x-2 mb-3'>
+              {/* eslint-disable-next-line */}
               <img className='rounded-full h-7' src={comment.data().userImage} alt="" />
               <p className='text-sm flex-1'>
                 <span className='font-bold'>{comment.data().username}</span>
