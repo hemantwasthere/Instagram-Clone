@@ -3,9 +3,13 @@ import { BiDotsHorizontalRounded } from 'react-icons/bi'
 import { AiOutlineHeart } from 'react-icons/ai'
 import { HiOutlinePaperAirplane, HiOutlineEmojiHappy } from 'react-icons/hi'
 import { BsChatDots, BsBookmark } from 'react-icons/bs'
+import { useSession } from 'next-auth/react'
 
 
 function Post({ id, username, userImg, img, caption }) {
+
+  const { data: session } = useSession();
+
   return (
     <div className='bg-white my-7 border rounded-sm'>
 
@@ -21,14 +25,16 @@ function Post({ id, username, userImg, img, caption }) {
 
 
       {/* Buttons */}
-      <div className='flex justify-between px-4 pt-4'>
-        <div className='flex space-x-4'>
-          <AiOutlineHeart className='btn' />
-          <BsChatDots className='btn' />
-          <HiOutlinePaperAirplane className='btn rotate-45' />
+      {session && (
+        <div className='flex justify-between px-4 pt-4'>
+          <div className='flex space-x-4'>
+            <AiOutlineHeart className='btn' />
+            <BsChatDots className='btn' />
+            <HiOutlinePaperAirplane className='btn rotate-45' />
+          </div>
+          <BsBookmark className='btn' />
         </div>
-        <BsBookmark className='btn' />
-      </div>
+      )}
 
       {/* caption */}
       <p className='p-5 truncate'>
@@ -40,13 +46,14 @@ function Post({ id, username, userImg, img, caption }) {
 
 
       {/* input box */}
-      <form className='flex items-center p-4'>
-      <HiOutlineEmojiHappy className='h-7' />
-      <input className='border-none flex-1 focus:ring-0 outline-none'
-       placeholder='Add a comment...' type="text" />
-      <button className='font-semibold text-blue-400'>Post</button>
-      </form>
-
+      {session && (
+        <form className='flex items-center p-4'>
+          <HiOutlineEmojiHappy className='h-7' />
+          <input className='border-none flex-1 focus:ring-0 outline-none'
+            placeholder='Add a comment...' type="text" />
+          <button className='font-semibold text-blue-400'>Post</button>
+        </form>
+      )}
 
     </div>
   )
